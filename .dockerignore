@@ -1,0 +1,15 @@
+# Ignora arquivos e diretórios desnecessários no build Docker
+target/
+.mvn/
+mvnw
+mvnw.cmd
+.git
+.gitignore
+.idea
+.vscode
+*.iml
+*.log
+.DS_Store
+HELP.md
+README.md
+

@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Serviço PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: timewise-postgres
+    environment:
+      # Credenciais do banco de dados
+      POSTGRES_DB: timewise_db
+      POSTGRES_USER: timewise_user
+      POSTGRES_PASSWORD: timewise_password
+    ports:
+      # Porta 5432 do host mapeada para 5432 do container
+      - "5432:5432"
+    volumes:
+      # Persistência dos dados do banco
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # Verifica se o PostgreSQL está pronto para conexões
+      test: ["CMD-SHELL", "pg_isready -U timewise_user -d timewise_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - timewise-network
+
+volumes:
+  # Volume nomeado para persistir dados do PostgreSQL
+  postgres_data:
+
+networks:
+  # Rede isolada para comunicação entre containers
+  timewise-network:
+    driver: bridge
+

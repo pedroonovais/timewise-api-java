@@ -1,3 +1,31 @@
 spring:
   application:
     name: timewise
+  
+  # Habilita Docker Compose para iniciar containers automaticamente
+  docker:
+    compose:
+      enabled: true
+      file: compose.yaml
+  
+  # Configuração do banco de dados PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/timewise_db
+    username: timewise_user
+    password: timewise_password
+    driver-class-name: org.postgresql.Driver
+  
+  # Configuração JPA/Hibernate
+  jpa:
+    hibernate:
+      # update: cria/atualiza o schema conforme as entidades (recomendado para desenvolvimento)
+      # create: recria o schema a cada inicialização (apaga dados existentes)
+      # create-drop: cria ao iniciar e apaga ao encerrar (útil para testes)
+      # validate: apenas valida o schema, não altera nada
+      # none: desabilita a geração automática
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
