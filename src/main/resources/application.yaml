@@ -29,3 +29,9 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  # Configuração de mensagens de validação (i18n)
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: true
