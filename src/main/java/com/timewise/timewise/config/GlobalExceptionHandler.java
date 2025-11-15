@@ -149,7 +149,9 @@ public class GlobalExceptionHandler {
 
         // Mapeia mensagens específicas para chaves do MessageSource
         if (lowerMessage.contains("não encontrado") || lowerMessage.contains("nao encontrado")) {
-            if (lowerMessage.contains("atividade")) {
+            if (lowerMessage.contains("score diário") || lowerMessage.contains("score diario")) {
+                return getMessage("error.scoreDiario.notfound", locale);
+            } else if (lowerMessage.contains("atividade")) {
                 return getMessage("error.atividade.notfound", locale);
             } else if (lowerMessage.contains("usuário") || lowerMessage.contains("usuario")) {
                 return getMessage("error.usuario.notfound", locale);
@@ -170,6 +172,20 @@ public class GlobalExceptionHandler {
 
         if (lowerMessage.contains("deve ser posterior")) {
             return getMessage("error.tempo.invalido", locale);
+        }
+
+        // Mapeia erros de processamento
+        if (lowerMessage.contains("erro ao processar dados da atividade")) {
+            return getMessage("error.atividade.processar", locale);
+        }
+
+        if (lowerMessage.contains("erro ao atualizar atividade")) {
+            return getMessage("error.atividade.atualizar", locale);
+        }
+
+        if (lowerMessage.contains("erro ao processar dados do usuário") || 
+            lowerMessage.contains("erro ao processar dados do usuario")) {
+            return getMessage("error.usuario.processar", locale);
         }
 
         // Se não encontrar mapeamento, retorna a mensagem original

@@ -1,5 +1,6 @@
 package com.timewise.timewise.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,9 @@ public class AtividadeService {
 
     @Autowired
     private AtividadeMapper atividadeMapper;
+
+    @Autowired
+    private ScoreDiarioService scoreDiarioService;
 
     /**
      * Lista todas as atividades cadastradas
@@ -86,6 +90,17 @@ public class AtividadeService {
         Atividade atividadeSalva = atividadeRepository.save(atividade);
         log.info("Atividade criada com sucesso. ID: {}", atividadeSalva.getId());
         
+        // Calcula e atualiza o score diário do usuário para a data da atividade
+        LocalDate dataAtividade = atividadeSalva.getTempoInicio().toLocalDate();
+        try {
+            scoreDiarioService.calcularESalvarScore(atividadeSalva.getUsuario().getId(), dataAtividade);
+            log.info("Score diário atualizado para usuário ID: {} na data: {}", 
+                atividadeSalva.getUsuario().getId(), dataAtividade);
+        } catch (Exception e) {
+            log.error("Erro ao calcular score diário após criar atividade: {}", e.getMessage());
+            // Não interrompe o fluxo, apenas loga o erro
+        }
+        
         return atividadeMapper.toResponseDTO(atividadeSalva);
     }
 
@@ -111,6 +126,10 @@ public class AtividadeService {
                 return new RuntimeException("Atividade não encontrada com ID: " + id);
             });
         
+        // Guarda a data antiga para recalcular o score se necessário
+        LocalDate dataAntiga = atividadeExistente.getTempoInicio() != null ? 
+            atividadeExistente.getTempoInicio().toLocalDate() : null;
+        
         // Valida se tempoFim é posterior a tempoInicio
         if (atividadeDTO.getTempoFim().isBefore(atividadeDTO.getTempoInicio()) || 
             atividadeDTO.getTempoFim().isEqual(atividadeDTO.getTempoInicio())) {
@@ -121,13 +140,26 @@ public class AtividadeService {
         // Atualiza os campos usando o mapper
         atividadeMapper.updateEntityFromDTO(atividadeExistente, atividadeDTO);
         
-        if (atividadeExistente == null) {
-            log.error("Erro: atividade existente é nula após atualização");
-            throw new RuntimeException("Erro ao atualizar atividade");
-        }
-        
         Atividade atividadeSalva = atividadeRepository.save(atividadeExistente);
         log.info("Atividade atualizada com sucesso. ID: {}", atividadeSalva.getId());
+        
+        // Calcula e atualiza o score diário para a data nova
+        LocalDate dataNova = atividadeSalva.getTempoInicio().toLocalDate();
+        try {
+            scoreDiarioService.calcularESalvarScore(atividadeSalva.getUsuario().getId(), dataNova);
+            log.info("Score diário atualizado para usuário ID: {} na data: {}", 
+                atividadeSalva.getUsuario().getId(), dataNova);
+            
+            // Se a data mudou, recalcula também a data antiga
+            if (dataAntiga != null && !dataAntiga.equals(dataNova)) {
+                scoreDiarioService.calcularESalvarScore(atividadeSalva.getUsuario().getId(), dataAntiga);
+                log.info("Score diário atualizado para data antiga: {}", dataAntiga);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao calcular score diário após atualizar atividade: {}", e.getMessage());
+            // Não interrompe o fluxo, apenas loga o erro
+        }
+        
         return atividadeMapper.toResponseDTO(atividadeSalva);
     }
 
@@ -144,14 +176,32 @@ public class AtividadeService {
         }
         log.info("Deletando atividade com ID: {}", id);
         
-        // Verifica se a atividade existe antes de deletar
-        if (!atividadeRepository.existsById(id)) {
-            log.warn("Atividade não encontrada com ID: {}", id);
-            throw new RuntimeException("Atividade não encontrada com ID: " + id);
-        }
+        // Busca a atividade para obter a data antes de deletar
+        Atividade atividade = atividadeRepository.findById(id)
+            .orElseThrow(() -> {
+                log.warn("Atividade não encontrada com ID: {}", id);
+                return new RuntimeException("Atividade não encontrada com ID: " + id);
+            });
+        
+        // Guarda informações para recalcular o score
+        Long usuarioId = atividade.getUsuario() != null ? atividade.getUsuario().getId() : null;
+        LocalDate dataAtividade = atividade.getTempoInicio() != null ? 
+            atividade.getTempoInicio().toLocalDate() : null;
         
         atividadeRepository.deleteById(id);
         log.info("Atividade deletada com sucesso. ID: {}", id);
+        
+        // Recalcula o score diário após deletar a atividade
+        if (usuarioId != null && dataAtividade != null) {
+            try {
+                scoreDiarioService.calcularESalvarScore(usuarioId, dataAtividade);
+                log.info("Score diário atualizado após deletar atividade. Usuário ID: {}, Data: {}", 
+                    usuarioId, dataAtividade);
+            } catch (Exception e) {
+                log.error("Erro ao calcular score diário após deletar atividade: {}", e.getMessage());
+                // Não interrompe o fluxo, apenas loga o erro
+            }
+        }
     }
 }
 
