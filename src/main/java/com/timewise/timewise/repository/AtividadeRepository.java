@@ -8,7 +8,14 @@ import com.timewise.timewise.model.Atividade;
 import com.timewise.timewise.model.Usuario;
 
 public interface AtividadeRepository extends JpaRepository<Atividade, Long> {
-    
+
+    /**
+     * Busca todas as atividades de um usuário
+     * @param usuarioId - ID do usuário
+     * @return Lista de atividades encontradas
+     */
+    List<Atividade> findByUsuarioId(Long usuarioId);
+
     /**
      * Busca todas as atividades de um usuário em uma data específica
      * @param usuario - Usuário das atividades

@@ -46,6 +46,14 @@ public class AtividadeController {
         return ResponseEntity.ok(atividade);
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    @Operation(summary = "Busca todas as atividades de um usuário", description = "Retorna uma lista de todas as atividades de um usuário específico")
+    public ResponseEntity<List<AtividadeResponseDTO>> getAtividadesByUsuario(@PathVariable Long usuarioId) {
+        List<AtividadeResponseDTO> atividades = atividadeService.buscarPorUsuario(usuarioId);
+        log.info("Atividades encontradas para usuário ID: {}", usuarioId);
+        return ResponseEntity.ok(atividades);
+    }
+
     @PostMapping
     @Operation(summary = "Cria uma nova atividade", description = "Cria uma nova atividade com os dados fornecidos")
     public ResponseEntity<AtividadeResponseDTO> criarAtividade(@Valid @RequestBody AtividadeRequestDTO atividadeDTO) {

@@ -203,5 +203,21 @@ public class AtividadeService {
             }
         }
     }
+
+    /**
+     * Busca todas as atividades de um usuário
+     * @param usuarioId - ID do usuário
+     * @return Lista de atividades encontradas
+     */
+    public List<AtividadeResponseDTO> buscarPorUsuario(Long usuarioId) {
+        if (usuarioId == null) {
+            log.warn("Tentativa de buscar atividades com usuarioId nulo");
+            throw new RuntimeException("ID do usuário não pode ser nulo");
+        }
+        log.info("Buscando atividades para usuário ID: {}", usuarioId);
+        return atividadeRepository.findByUsuarioId(usuarioId).stream()
+            .map(atividadeMapper::toResponseDTO)
+            .collect(Collectors.toList());
+    }
 }
 

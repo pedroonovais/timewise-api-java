@@ -96,8 +96,8 @@ public class ScoreDiarioService {
 
     /**
      * Calcula o score diário baseado nas atividades do usuário na data
-     * Score = (pausa / (trabalho + pausa)) * 100
-     * Se trabalho + pausa = 0, score = 0
+     * Score baseado em meta de horas de trabalho (6-8h = score alto)
+     * Com bônus se tiver pausas adequadas (10-20% do tempo)
      * @param usuario - Usuário para calcular o score
      * @param dataTrabalho - Data do trabalho
      * @return Score calculado (0-100)
@@ -137,19 +137,58 @@ public class ScoreDiarioService {
 
         log.debug("Total trabalho: {} horas, Total pausa: {} horas", totalTrabalhoHoras, totalPausaHoras);
 
-        // Calcula o score
+        // Calcula o score baseado em meta de horas de trabalho
         double totalHoras = totalTrabalhoHoras + totalPausaHoras;
         Integer score;
         
         if (totalHoras == 0) {
             score = 0;
         } else {
-            // Score = (pausa / (trabalho + pausa)) * 100
-            double scoreDouble = (totalPausaHoras / totalHoras) * 100;
-            score = (int) Math.round(scoreDouble);
+            // Meta de horas de trabalho ideal: 6-8 horas
+            double metaMinima = 6.0;
+            double metaMaxima = 8.0;
+            double metaIdeal = 7.0; // Ponto ideal no meio do range
+            
+            // Calcula o score baseado nas horas trabalhadas
+            double scoreBase;
+            if (totalTrabalhoHoras >= metaMinima && totalTrabalhoHoras <= metaMaxima) {
+                // Dentro da meta ideal: score alto (70-90 pontos)
+                // Quanto mais próximo de 7h, maior o score
+                double distanciaDoIdeal = Math.abs(totalTrabalhoHoras - metaIdeal);
+                double scoreMaximo = 90.0;
+                scoreBase = scoreMaximo - (distanciaDoIdeal * 10.0); // Reduz 10 pontos por hora de distância
+            } else if (totalTrabalhoHoras < metaMinima) {
+                // Abaixo da meta: score proporcional (0-70 pontos)
+                scoreBase = (totalTrabalhoHoras / metaMinima) * 70.0;
+            } else {
+                // Acima da meta: score reduzido (acima de 8h começa a reduzir)
+                // Máximo de 90 pontos, reduz 5 pontos por hora acima de 8h
+                double horasAcima = totalTrabalhoHoras - metaMaxima;
+                scoreBase = 90.0 - (horasAcima * 5.0);
+                if (scoreBase < 0) scoreBase = 0;
+            }
+            
+            // Calcula a proporção de pausa
+            double proporcaoPausa = (totalPausaHoras / totalHoras) * 100;
+            
+            // Bônus para pausas adequadas (entre 10% e 20% do tempo)
+            // Ideal: 15% de pausa
+            double bonus = 0.0;
+            if (proporcaoPausa >= 10.0 && proporcaoPausa <= 20.0) {
+                // Bônus máximo de 10 pontos se estiver no range ideal (15%)
+                double distanciaDoIdeal = Math.abs(proporcaoPausa - 15.0);
+                bonus = 10.0 - (distanciaDoIdeal * 1.0); // Bônus decresce conforme distancia do ideal
+                if (bonus < 0) bonus = 0;
+            }
+            
+            // Score final = score base + bônus (limitado a 100)
+            double scoreFinal = scoreBase + bonus;
+            score = (int) Math.round(Math.min(Math.max(scoreFinal, 0.0), 100.0));
         }
 
-        log.info("Score calculado: {}% (Trabalho: {}h, Pausa: {}h)", score, totalTrabalhoHoras, totalPausaHoras);
+        double proporcaoPausaPercentual = totalHoras > 0 ? (totalPausaHoras / totalHoras) * 100 : 0.0;
+        log.info("Score calculado: {}% (Trabalho: {}h, Pausa: {}h, Proporção pausa: {}%)", 
+            score, totalTrabalhoHoras, totalPausaHoras, String.format("%.2f", proporcaoPausaPercentual));
         return score;
     }
 
