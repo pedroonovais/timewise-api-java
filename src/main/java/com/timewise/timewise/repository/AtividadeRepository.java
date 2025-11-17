@@ -2,6 +2,8 @@ package com.timewise.timewise.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.timewise.timewise.model.Atividade;
@@ -15,6 +17,14 @@ public interface AtividadeRepository extends JpaRepository<Atividade, Long> {
      * @return Lista de atividades encontradas
      */
     List<Atividade> findByUsuarioId(Long usuarioId);
+    
+    /**
+     * Busca todas as atividades de um usuário com paginação
+     * @param usuarioId - ID do usuário
+     * @param pageable - Parâmetros de paginação
+     * @return Página de atividades encontradas
+     */
+    Page<Atividade> findByUsuarioId(Long usuarioId, Pageable pageable);
 
     /**
      * Busca todas as atividades de um usuário em uma data específica

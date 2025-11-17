@@ -1,10 +1,11 @@
 package com.timewise.timewise.service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +34,15 @@ public class AtividadeService {
     private ScoreDiarioService scoreDiarioService;
 
     /**
-     * Lista todas as atividades cadastradas
-     * @return Lista de todas as atividades
+     * Lista todas as atividades cadastradas com paginação
+     * @param pageable - Parâmetros de paginação (page, size, sort)
+     * @return Página de atividades
      */
-    public List<AtividadeResponseDTO> listarTodos() {
-        log.info("Listando todas as atividades");
-        return atividadeRepository.findAll().stream()
-            .map(atividadeMapper::toResponseDTO)
-            .collect(Collectors.toList());
+    public Page<AtividadeResponseDTO> listarTodos(Pageable pageable) {
+        log.info("Listando atividades - página: {}, tamanho: {}, ordenação: {}", 
+            pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+        return atividadeRepository.findAll(pageable)
+            .map(atividadeMapper::toResponseDTO);
     }
 
     /**
@@ -70,6 +72,7 @@ public class AtividadeService {
      * @throws RuntimeException se o usuário não for encontrado ou se houver erro de validação
      */
     @Transactional
+    @CacheEvict(value = {"atividades", "atividadesPorUsuario", "scoresPorUsuario"}, allEntries = true)
     public AtividadeResponseDTO criar(AtividadeRequestDTO atividadeDTO) {
         log.info("Criando nova atividade para usuário ID: {}", atividadeDTO.getUsuarioId());
         
@@ -112,6 +115,7 @@ public class AtividadeService {
      * @throws RuntimeException se a atividade não for encontrada ou se houver erro de validação
      */
     @Transactional
+    @CacheEvict(value = {"atividades", "atividadesPorUsuario", "scoresPorUsuario"}, allEntries = true)
     public AtividadeResponseDTO atualizar(Long id, AtividadeRequestDTO atividadeDTO) {
         if (id == null) {
             log.warn("Tentativa de atualizar atividade com ID nulo");
@@ -169,6 +173,7 @@ public class AtividadeService {
      * @throws RuntimeException se a atividade não for encontrada ou se o ID for nulo
      */
     @Transactional
+    @CacheEvict(value = {"atividades", "atividadesPorUsuario", "scoresPorUsuario"}, allEntries = true)
     public void deletar(Long id) {
         if (id == null) {
             log.warn("Tentativa de deletar atividade com ID nulo");
@@ -205,19 +210,20 @@ public class AtividadeService {
     }
 
     /**
-     * Busca todas as atividades de um usuário
+     * Busca todas as atividades de um usuário com paginação
      * @param usuarioId - ID do usuário
-     * @return Lista de atividades encontradas
+     * @param pageable - Parâmetros de paginação (page, size, sort)
+     * @return Página de atividades encontradas
      */
-    public List<AtividadeResponseDTO> buscarPorUsuario(Long usuarioId) {
+    public Page<AtividadeResponseDTO> buscarPorUsuario(Long usuarioId, Pageable pageable) {
         if (usuarioId == null) {
             log.warn("Tentativa de buscar atividades com usuarioId nulo");
             throw new RuntimeException("ID do usuário não pode ser nulo");
         }
-        log.info("Buscando atividades para usuário ID: {}", usuarioId);
-        return atividadeRepository.findByUsuarioId(usuarioId).stream()
-            .map(atividadeMapper::toResponseDTO)
-            .collect(Collectors.toList());
+        log.info("Buscando atividades para usuário ID: {} - página: {}, tamanho: {}", 
+            usuarioId, pageable.getPageNumber(), pageable.getPageSize());
+        return atividadeRepository.findByUsuarioId(usuarioId, pageable)
+            .map(atividadeMapper::toResponseDTO);
     }
 }
 

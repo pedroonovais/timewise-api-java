@@ -1,9 +1,11 @@
 package com.timewise.timewise.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,11 +34,21 @@ public class ScoreDiarioController {
 
     @GetMapping("/usuario/{usuarioId}")
     @Operation(summary = "Lista todos os scores diários de um usuário", 
-               description = "Retorna uma lista de todos os scores diários de um usuário específico")
-    public ResponseEntity<List<ScoreDiarioResponseDTO>> listarPorUsuario(
-            @PathVariable Long usuarioId) {
-        List<ScoreDiarioResponseDTO> scores = scoreDiarioService.listarPorUsuario(usuarioId);
-        log.info("Retornando {} scores diários para usuário ID: {}", scores.size(), usuarioId);
+               description = "Retorna uma página de scores diários de um usuário específico. Parâmetros: page (padrão: 0), size (padrão: 20, máximo: 100), sort (padrão: dataTrabalho,desc)")
+    public ResponseEntity<Page<ScoreDiarioResponseDTO>> listarPorUsuario(
+            @PathVariable Long usuarioId,
+            @PageableDefault(page = 0, size = 20, sort = "dataTrabalho", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
+        // Valida tamanho máximo
+        if (pageable.getPageSize() > 100) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), 
+                100, 
+                pageable.getSort()
+            );
+        }
+        Page<ScoreDiarioResponseDTO> scores = scoreDiarioService.listarPorUsuario(usuarioId, pageable);
+        log.info("Retornando página {} de scores diários para usuário ID: {} (total: {})", 
+            scores.getNumber(), usuarioId, scores.getTotalElements());
         return ResponseEntity.ok(scores);
     }
 

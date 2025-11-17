@@ -1,8 +1,9 @@
 package com.timewise.timewise.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,10 +32,21 @@ public class AtividadeController {
     private AtividadeService atividadeService;
 
     @GetMapping
-    @Operation(summary = "Lista todas as atividades", description = "Retorna uma lista de todas as atividades cadastradas")
-    public ResponseEntity<List<AtividadeResponseDTO>> listarTodos() {
-        List<AtividadeResponseDTO> atividades = atividadeService.listarTodos();
-        log.info("Retornando {} atividades", atividades.size());
+    @Operation(summary = "Lista todas as atividades", 
+               description = "Retorna uma página de atividades cadastradas. Parâmetros: page (padrão: 0), size (padrão: 20, máximo: 100), sort (padrão: id,desc)")
+    public ResponseEntity<Page<AtividadeResponseDTO>> listarTodos(
+            @PageableDefault(page = 0, size = 20, sort = "id", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
+        // Valida tamanho máximo
+        if (pageable.getPageSize() > 100) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), 
+                100, 
+                pageable.getSort()
+            );
+        }
+        Page<AtividadeResponseDTO> atividades = atividadeService.listarTodos(pageable);
+        log.info("Retornando página {} de atividades (total: {})", 
+            atividades.getNumber(), atividades.getTotalElements());
         return ResponseEntity.ok(atividades);
     }
 
@@ -47,10 +59,22 @@ public class AtividadeController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    @Operation(summary = "Busca todas as atividades de um usuário", description = "Retorna uma lista de todas as atividades de um usuário específico")
-    public ResponseEntity<List<AtividadeResponseDTO>> getAtividadesByUsuario(@PathVariable Long usuarioId) {
-        List<AtividadeResponseDTO> atividades = atividadeService.buscarPorUsuario(usuarioId);
-        log.info("Atividades encontradas para usuário ID: {}", usuarioId);
+    @Operation(summary = "Busca todas as atividades de um usuário", 
+               description = "Retorna uma página de atividades de um usuário específico. Parâmetros: page (padrão: 0), size (padrão: 20, máximo: 100), sort (padrão: id,desc)")
+    public ResponseEntity<Page<AtividadeResponseDTO>> getAtividadesByUsuario(
+            @PathVariable Long usuarioId,
+            @PageableDefault(page = 0, size = 20, sort = "id", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
+        // Valida tamanho máximo
+        if (pageable.getPageSize() > 100) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), 
+                100, 
+                pageable.getSort()
+            );
+        }
+        Page<AtividadeResponseDTO> atividades = atividadeService.buscarPorUsuario(usuarioId, pageable);
+        log.info("Retornando página {} de atividades para usuário ID: {} (total: {})", 
+            atividades.getNumber(), usuarioId, atividades.getTotalElements());
         return ResponseEntity.ok(atividades);
     }
 

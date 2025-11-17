@@ -1,8 +1,9 @@
 package com.timewise.timewise.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,10 +32,21 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @GetMapping
-    @Operation(summary = "Lista todos os usuários", description = "Retorna uma lista de todos os usuários cadastrados")
-    public ResponseEntity<List<UsuarioResponseDTO>> listarTodos() {
-        List<UsuarioResponseDTO> usuarios = usuarioService.listarTodos();
-        log.info("Retornando {} usuários", usuarios.size());
+    @Operation(summary = "Lista todos os usuários", 
+               description = "Retorna uma página de usuários cadastrados. Parâmetros: page (padrão: 0), size (padrão: 20, máximo: 100), sort (padrão: id,desc)")
+    public ResponseEntity<Page<UsuarioResponseDTO>> listarTodos(
+            @PageableDefault(page = 0, size = 20, sort = "id", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
+        // Valida tamanho máximo
+        if (pageable.getPageSize() > 100) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), 
+                100, 
+                pageable.getSort()
+            );
+        }
+        Page<UsuarioResponseDTO> usuarios = usuarioService.listarTodos(pageable);
+        log.info("Retornando página {} de usuários (total: {})", 
+            usuarios.getNumber(), usuarios.getTotalElements());
         return ResponseEntity.ok(usuarios);
     }
 

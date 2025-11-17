@@ -1,10 +1,11 @@
 package com.timewise.timewise.service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +31,15 @@ public class UsuarioService {
     private UsuarioMapper usuarioMapper;
 
     /**
-     * Lista todos os usuários cadastrados
-     * @return Lista de todos os usuários (sem senha)
+     * Lista todos os usuários cadastrados com paginação
+     * @param pageable - Parâmetros de paginação (page, size, sort)
+     * @return Página de usuários (sem senha)
      */
-    public List<UsuarioResponseDTO> listarTodos() {
-        log.info("Listando todos os usuários");
-        return usuarioRepository.findAll().stream()
-            .map(usuarioMapper::toResponseDTO)
-            .collect(Collectors.toList());
+    public Page<UsuarioResponseDTO> listarTodos(Pageable pageable) {
+        log.info("Listando usuários - página: {}, tamanho: {}, ordenação: {}", 
+            pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+        return usuarioRepository.findAll(pageable)
+            .map(usuarioMapper::toResponseDTO);
     }
 
     /**
@@ -77,6 +79,7 @@ public class UsuarioService {
      * @throws RuntimeException se o email já estiver cadastrado
      */
     @Transactional
+    @CacheEvict(value = "usuarios", allEntries = true)
     public UsuarioResponseDTO criar(UsuarioRequestDTO usuarioDTO) {
         log.info("Criando novo usuário com email: {}", usuarioDTO.getEmail());
         
@@ -108,6 +111,7 @@ public class UsuarioService {
      * @throws RuntimeException se o usuário não for encontrado ou se o email já estiver em uso por outro usuário
      */
     @Transactional
+    @CacheEvict(value = "usuarios", allEntries = true)
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioDTO) {
         if (id == null) {
             log.warn("Tentativa de atualizar usuário com ID nulo");
@@ -145,6 +149,7 @@ public class UsuarioService {
      * @throws RuntimeException se o usuário não for encontrado ou se o ID for nulo
      */
     @Transactional
+    @CacheEvict(value = "usuarios", allEntries = true)
     public void deletar(Long id) {
         if (id == null) {
             log.warn("Tentativa de deletar usuário com ID nulo");

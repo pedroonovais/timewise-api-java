@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.timewise.timewise.model.ScoreDiario;
@@ -25,5 +27,13 @@ public interface ScoreDiarioRepository extends JpaRepository<ScoreDiario, Long> 
      * @return Lista de scores diários ordenados por data
      */
     List<ScoreDiario> findByUsuarioOrderByDataTrabalhoDesc(Usuario usuario);
+    
+    /**
+     * Busca todos os scores diários de um usuário com paginação, ordenados por data (mais recente primeiro)
+     * @param usuario - Usuário dos scores
+     * @param pageable - Parâmetros de paginação
+     * @return Página de scores diários ordenados por data
+     */
+    Page<ScoreDiario> findByUsuarioOrderByDataTrabalhoDesc(Usuario usuario, Pageable pageable);
 }
 

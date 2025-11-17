@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +51,7 @@ public class ScoreDiarioService {
      * @return ScoreDiario calculado e salvo
      */
     @Transactional
+    @CacheEvict(value = "scoresPorUsuario", key = "#usuarioId")
     public ScoreDiario calcularESalvarScore(Long usuarioId, LocalDate dataTrabalho) {
         if (usuarioId == null) {
             log.warn("Tentativa de calcular score com usuarioId nulo");
@@ -193,16 +197,18 @@ public class ScoreDiarioService {
     }
 
     /**
-     * Lista todos os scores diários de um usuário
+     * Lista todos os scores diários de um usuário com paginação
      * @param usuarioId - ID do usuário
-     * @return Lista de scores diários
+     * @param pageable - Parâmetros de paginação (page, size, sort)
+     * @return Página de scores diários
      */
-    public List<ScoreDiarioResponseDTO> listarPorUsuario(Long usuarioId) {
+    public Page<ScoreDiarioResponseDTO> listarPorUsuario(Long usuarioId, Pageable pageable) {
         if (usuarioId == null) {
             log.warn("Tentativa de listar scores com usuarioId nulo");
             throw new RuntimeException("ID do usuário não pode ser nulo");
         }
-        log.info("Listando scores diários do usuário ID: {}", usuarioId);
+        log.info("Listando scores diários do usuário ID: {} - página: {}, tamanho: {}", 
+            usuarioId, pageable.getPageNumber(), pageable.getPageSize());
         
         Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> {
@@ -210,9 +216,8 @@ public class ScoreDiarioService {
                 return new RuntimeException("Usuário não encontrado com ID: " + usuarioId);
             });
 
-        return scoreDiarioRepository.findByUsuarioOrderByDataTrabalhoDesc(usuario).stream()
-            .map(scoreDiarioMapper::toResponseDTO)
-            .toList();
+        return scoreDiarioRepository.findByUsuarioOrderByDataTrabalhoDesc(usuario, pageable)
+            .map(scoreDiarioMapper::toResponseDTO);
     }
 
     /**
