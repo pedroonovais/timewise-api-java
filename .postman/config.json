@@ -1,0 +1,14 @@
+{
+  "workspace": {
+    "id": "b7524fd1-a4d5-4f78-8d27-393b4ead9392"
+  },
+  "entities": {
+    "collections": [
+      "..\\postman\\collections\\TimeWise Java.postman_collection.json"
+    ],
+    "environments": [],
+    "specs": [],
+    "flows": [],
+    "globals": []
+  }
+}
