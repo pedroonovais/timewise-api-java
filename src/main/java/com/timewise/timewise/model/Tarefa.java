@@ -1,8 +1,6 @@
 package com.timewise.timewise.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,37 +14,26 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-import com.timewise.timewise.enums.AtividadeTipo;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "atividades")
-public class Atividade {
+@Table(name = "tarefas")
+public class Tarefa {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "{atividade.nome.notblank}")
+    @NotBlank(message = "{tarefa.nome.notblank}")
     private String nome;
 
-    @NotNull(message = "{atividade.usuario.notnull}")
+    @NotNull(message = "{tarefa.descricao.notnull}")
+    private String descricao;
+
+    @NotNull(message = "{tarefa.usuario.notnull}")
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-
-    @NotNull(message = "{atividade.tempoInicio.notnull}")
-    private LocalDateTime tempoInicio;
-
-    @NotNull(message = "{atividade.tempoFim.notnull}")
-    private LocalDateTime tempoFim;
-
-    @NotNull(message = "{atividade.tipo.notnull}")
-    @Enumerated(EnumType.STRING)
-    private AtividadeTipo tipo;
 }

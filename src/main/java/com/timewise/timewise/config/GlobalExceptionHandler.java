@@ -151,6 +151,8 @@ public class GlobalExceptionHandler {
         if (lowerMessage.contains("não encontrado") || lowerMessage.contains("nao encontrado")) {
             if (lowerMessage.contains("score diário") || lowerMessage.contains("score diario")) {
                 return getMessage("error.scoreDiario.notfound", locale);
+            } else if (lowerMessage.contains("tarefa")) {
+                return getMessage("error.tarefa.notfound", locale);
             } else if (lowerMessage.contains("atividade")) {
                 return getMessage("error.atividade.notfound", locale);
             } else if (lowerMessage.contains("usuário") || lowerMessage.contains("usuario")) {
@@ -175,6 +177,14 @@ public class GlobalExceptionHandler {
         }
 
         // Mapeia erros de processamento
+        if (lowerMessage.contains("erro ao processar dados da tarefa")) {
+            return getMessage("error.tarefa.processar", locale);
+        }
+
+        if (lowerMessage.contains("erro ao atualizar tarefa")) {
+            return getMessage("error.tarefa.atualizar", locale);
+        }
+
         if (lowerMessage.contains("erro ao processar dados da atividade")) {
             return getMessage("error.atividade.processar", locale);
         }

@@ -30,7 +30,9 @@ public class CacheConfig {
             "atividades",
             "atividadesPorUsuario",
             "usuarios",
-            "scoresPorUsuario"
+            "scoresPorUsuario",
+            "tarefas",
+            "tarefasPorUsuario"
         ));
         cacheManager.setAllowNullValues(false);
         return cacheManager;
