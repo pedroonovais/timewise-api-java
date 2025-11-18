@@ -710,19 +710,3 @@ As configurações podem ser sobrescritas via variáveis de ambiente:
 - `JWT_SECRET`: Chave secreta para assinatura JWT
 - `JWT_EXPIRATION`: Tempo de expiração do token (em milissegundos)
 
----
-
-## 📄 Licença
-
-Este projeto é parte de um trabalho acadêmico desenvolvido para a disciplina de Arquitetura de Software.
-
----
-
-## 🤝 Contribuindo
-
-Este é um projeto acadêmico. Para contribuições, entre em contato com os desenvolvedores.
-
----
-
-**Desenvolvido com ❤️ pela equipe TimeWise**
-
