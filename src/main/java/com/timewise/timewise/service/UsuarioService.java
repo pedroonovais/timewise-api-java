@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,9 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * Lista todos os usuários cadastrados com paginação
@@ -97,6 +101,11 @@ public class UsuarioService {
             throw new RuntimeException("Erro ao processar dados do usuário");
         }
         
+        // Criptografa a senha antes de salvar no banco
+        String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
+        usuario.setSenha(senhaCriptografada);
+        log.debug("Senha criptografada para novo usuário");
+        
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
         log.info("Usuário criado com sucesso. ID: {}", usuarioSalvo.getId());
         
@@ -137,6 +146,13 @@ public class UsuarioService {
         
         // Atualiza os campos usando o mapper
         usuarioMapper.updateEntityFromDTO(usuarioExistente, usuarioDTO);
+        
+        // Se uma nova senha foi fornecida, criptografa antes de salvar
+        if (usuarioDTO.getSenha() != null && !usuarioDTO.getSenha().isEmpty()) {
+            String senhaCriptografada = passwordEncoder.encode(usuarioDTO.getSenha());
+            usuarioExistente.setSenha(senhaCriptografada);
+            log.debug("Senha atualizada e criptografada para usuário ID: {}", id);
+        }
         
         Usuario usuarioSalvo = usuarioRepository.save(usuarioExistente);
         log.info("Usuário atualizado com sucesso. ID: {}", usuarioSalvo.getId());

@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,7 +32,8 @@ public class Usuario {
     private String email;
 
     @NotBlank(message = "{usuario.senha.notblank}")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "{usuario.senha.pattern}")
+    // Nota: Validação de padrão (@Pattern) removida porque a senha é criptografada com BCrypt antes de salvar
+    // A validação do padrão é feita no DTO (UsuarioRequestDTO) onde a senha ainda está em texto plano
     private String senha;
     
 }

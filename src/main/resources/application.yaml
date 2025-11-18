@@ -35,3 +35,8 @@ spring:
     basename: messages
     encoding: UTF-8
     fallback-to-system-locale: true
+
+# Configuração JWT
+jwt:
+  secret: timewise-secret-key-2024-very-secure-and-long-key-for-jwt-token-generation-minimum-256-bits
+  expiration: 86400000 # 24 horas em milissegundos
