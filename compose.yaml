@@ -25,9 +25,37 @@ services:
     networks:
       - timewise-network
 
+  # Serviço RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: timewise-rabbitmq
+    environment:
+      # Credenciais do RabbitMQ
+      RABBITMQ_DEFAULT_USER: timewise_user
+      RABBITMQ_DEFAULT_PASS: timewise_password
+    ports:
+      # Porta 5672 do host mapeada para 5672 do container (AMQP)
+      - "5672:5672"
+      # Porta 15672 do host mapeada para 15672 do container (Management UI)
+      - "15672:15672"
+    volumes:
+      # Persistência dos dados do RabbitMQ
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      # Verifica se o RabbitMQ está pronto para conexões
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - timewise-network
+
 volumes:
   # Volume nomeado para persistir dados do PostgreSQL
   postgres_data:
+  # Volume nomeado para persistir dados do RabbitMQ
+  rabbitmq_data:
 
 networks:
   # Rede isolada para comunicação entre containers

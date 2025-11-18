@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.timewise.timewise.dto.AtividadeRequestDTO;
 import com.timewise.timewise.dto.AtividadeResponseDTO;
 import com.timewise.timewise.mapper.AtividadeMapper;
+import com.timewise.timewise.messaging.AtividadeEventPublisher;
 import com.timewise.timewise.model.Atividade;
 import com.timewise.timewise.repository.AtividadeRepository;
 
@@ -31,7 +32,7 @@ public class AtividadeService {
     private AtividadeMapper atividadeMapper;
 
     @Autowired
-    private ScoreDiarioService scoreDiarioService;
+    private AtividadeEventPublisher atividadeEventPublisher;
 
     /**
      * Lista todas as atividades cadastradas com paginação
@@ -93,16 +94,13 @@ public class AtividadeService {
         Atividade atividadeSalva = atividadeRepository.save(atividade);
         log.info("Atividade criada com sucesso. ID: {}", atividadeSalva.getId());
         
-        // Calcula e atualiza o score diário do usuário para a data da atividade
+        // Publica evento para cálculo assíncrono de score
         LocalDate dataAtividade = atividadeSalva.getTempoInicio().toLocalDate();
-        try {
-            scoreDiarioService.calcularESalvarScore(atividadeSalva.getUsuario().getId(), dataAtividade);
-            log.info("Score diário atualizado para usuário ID: {} na data: {}", 
-                atividadeSalva.getUsuario().getId(), dataAtividade);
-        } catch (Exception e) {
-            log.error("Erro ao calcular score diário após criar atividade: {}", e.getMessage());
-            // Não interrompe o fluxo, apenas loga o erro
-        }
+        atividadeEventPublisher.publicarAtividadeCriada(
+            atividadeSalva.getId(),
+            atividadeSalva.getUsuario().getId(),
+            dataAtividade
+        );
         
         return atividadeMapper.toResponseDTO(atividadeSalva);
     }
@@ -147,22 +145,14 @@ public class AtividadeService {
         Atividade atividadeSalva = atividadeRepository.save(atividadeExistente);
         log.info("Atividade atualizada com sucesso. ID: {}", atividadeSalva.getId());
         
-        // Calcula e atualiza o score diário para a data nova
+        // Publica evento para cálculo assíncrono de score
         LocalDate dataNova = atividadeSalva.getTempoInicio().toLocalDate();
-        try {
-            scoreDiarioService.calcularESalvarScore(atividadeSalva.getUsuario().getId(), dataNova);
-            log.info("Score diário atualizado para usuário ID: {} na data: {}", 
-                atividadeSalva.getUsuario().getId(), dataNova);
-            
-            // Se a data mudou, recalcula também a data antiga
-            if (dataAntiga != null && !dataAntiga.equals(dataNova)) {
-                scoreDiarioService.calcularESalvarScore(atividadeSalva.getUsuario().getId(), dataAntiga);
-                log.info("Score diário atualizado para data antiga: {}", dataAntiga);
-            }
-        } catch (Exception e) {
-            log.error("Erro ao calcular score diário após atualizar atividade: {}", e.getMessage());
-            // Não interrompe o fluxo, apenas loga o erro
-        }
+        atividadeEventPublisher.publicarAtividadeAtualizada(
+            atividadeSalva.getId(),
+            atividadeSalva.getUsuario().getId(),
+            dataNova,
+            dataAntiga
+        );
         
         return atividadeMapper.toResponseDTO(atividadeSalva);
     }
@@ -196,16 +186,9 @@ public class AtividadeService {
         atividadeRepository.deleteById(id);
         log.info("Atividade deletada com sucesso. ID: {}", id);
         
-        // Recalcula o score diário após deletar a atividade
+        // Publica evento para cálculo assíncrono de score após deletar
         if (usuarioId != null && dataAtividade != null) {
-            try {
-                scoreDiarioService.calcularESalvarScore(usuarioId, dataAtividade);
-                log.info("Score diário atualizado após deletar atividade. Usuário ID: {}, Data: {}", 
-                    usuarioId, dataAtividade);
-            } catch (Exception e) {
-                log.error("Erro ao calcular score diário após deletar atividade: {}", e.getMessage());
-                // Não interrompe o fluxo, apenas loga o erro
-            }
+            atividadeEventPublisher.publicarAtividadeDeletada(id, usuarioId, dataAtividade);
         }
     }
 

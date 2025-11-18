@@ -35,6 +35,32 @@ spring:
     basename: messages
     encoding: UTF-8
     fallback-to-system-locale: true
+  
+  # Configuração RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: timewise_user
+    password: timewise_password
+    # Configuração de conexão com retry automático
+    connection-timeout: 60000
+    template:
+      retry:
+        enabled: true
+        initial-interval: 1000
+        max-attempts: 3
+        multiplier: 2
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          multiplier: 2
+        acknowledge-mode: auto
+        prefetch: 10
+        # Aguarda o RabbitMQ estar pronto antes de iniciar listeners
+        auto-startup: true
 
 # Configuração JWT
 jwt:
