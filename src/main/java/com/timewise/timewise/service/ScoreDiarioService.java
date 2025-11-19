@@ -268,5 +268,59 @@ public class ScoreDiarioService {
 
         return scoreDiarioMapper.toResponseDTO(scoreDiario);
     }
+
+    /**
+     * Calcula as horas de trabalho e pausa de um usuário para uma data específica
+     * @param usuarioId - ID do usuário
+     * @param dataTrabalho - Data do trabalho
+     * @return Array com [horasTrabalho, horasPausa]
+     */
+    public double[] calcularHorasTrabalhoEPausa(Long usuarioId, LocalDate dataTrabalho) {
+        if (usuarioId == null) {
+            log.warn("Tentativa de calcular horas com usuarioId nulo");
+            throw new RuntimeException("ID do usuário não pode ser nulo");
+        }
+        log.info("Calculando horas de trabalho e pausa para usuário ID: {} na data: {}", usuarioId, dataTrabalho);
+
+        // Busca o usuário
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+            .orElseThrow(() -> {
+                log.warn("Usuário não encontrado com ID: {}", usuarioId);
+                return new RuntimeException("Usuário não encontrado com ID: " + usuarioId);
+            });
+
+        // Define o início e fim do dia
+        LocalDateTime inicioDia = dataTrabalho.atStartOfDay();
+        LocalDateTime fimDia = dataTrabalho.atTime(23, 59, 59, 999999999);
+
+        // Busca todas as atividades do usuário no dia
+        List<Atividade> atividades = atividadeRepository.findByUsuarioAndTempoInicioBetween(
+            usuario, inicioDia, fimDia
+        );
+
+        double totalTrabalhoHoras = 0.0;
+        double totalPausaHoras = 0.0;
+
+        // Soma os tempos de trabalho e pausa
+        for (Atividade atividade : atividades) {
+            if (atividade.getTempoInicio() == null || atividade.getTempoFim() == null) {
+                log.warn("Atividade com tempo nulo ignorada. ID: {}", atividade.getId());
+                continue;
+            }
+
+            // Calcula a duração em horas
+            Duration duracao = Duration.between(atividade.getTempoInicio(), atividade.getTempoFim());
+            double horas = duracao.toMinutes() / 60.0; // Converte minutos para horas
+
+            if (atividade.getTipo() == AtividadeTipo.TRABALHO) {
+                totalTrabalhoHoras += horas;
+            } else if (atividade.getTipo() == AtividadeTipo.PAUSA) {
+                totalPausaHoras += horas;
+            }
+        }
+
+        log.debug("Horas calculadas - Trabalho: {}h, Pausa: {}h", totalTrabalhoHoras, totalPausaHoras);
+        return new double[]{totalTrabalhoHoras, totalPausaHoras};
+    }
 }
 

@@ -1,9 +1,8 @@
 {
   "info": {
-    "_postman_id": "8a20477b-db77-4a41-ab0a-0eb9c388b9b1",
+    "_postman_id": "f8f4c61f-0813-49bd-b87b-4de59b29bf54",
     "name": "TimeWise Java",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "20348320"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -11,10 +10,8 @@
       "item": [
         {
           "name": "Get by Id",
-          "id": "503b1feb-e44b-47e3-af0f-a44bd45efa3b",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/usuarios/33",
               "host": [
@@ -25,15 +22,12 @@
                 "33"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get All",
-          "id": "5c86dfe3-12c9-4aea-af20-80ddceef5854",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/usuarios",
               "host": [
@@ -43,15 +37,12 @@
                 "usuarios"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Create",
-          "id": "71570eb1-bbb2-4fec-81b6-dcae2b4ec10c",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"nome\": \"Pedro Novais\",\r\n    \"email\": \"phen@gmail.com\",\r\n    \"senha\": \"@Pedro123\"\r\n}",
@@ -70,15 +61,12 @@
                 "usuarios"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Update",
-          "id": "b40dc3b3-053b-4502-a8ca-183b28c9bf91",
           "request": {
             "method": "PUT",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"nome\": \"Pedro Novais\",\r\n    \"email\": \"phenrique101007@gmail.com\",\r\n    \"senha\": \"@Geladeirax99\"\r\n}",
@@ -98,15 +86,12 @@
                 "3"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Delete",
-          "id": "2dbcd6e6-a0c6-495e-970a-d7decd7a5ece",
           "request": {
             "method": "DELETE",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"nome\": \"Pedro Novais\",\r\n    \"email\": \"phenrique101007@gmail.com\",\r\n    \"senha\": \"@Geladeirax99\"\r\n}",
@@ -126,21 +111,17 @@
                 "3"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "c730026d-70a5-47d7-b90b-000a94c2ab58"
+      ]
     },
     {
       "name": "Auth",
       "item": [
         {
           "name": "Login",
-          "id": "3275ef98-805a-4bcc-b301-5671fd9e462c",
           "request": {
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"email\": \"phen@gmail.com\",\r\n    \"senha\": \"@Pedro123\"\r\n}",
@@ -160,21 +141,17 @@
                 "login"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "b0843b95-444c-444f-a722-54ca0729fc4b"
+      ]
     },
     {
       "name": "Atividade",
       "item": [
         {
           "name": "Get by Id",
-          "id": "63bb7fdc-8f11-456c-9827-2a69332fe509",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/atividades/11",
               "host": [
@@ -185,34 +162,39 @@
                 "11"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get by Usuario Id",
-          "id": "453b72b5-b565-4315-952c-df5dd59703f0",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwaGVuQGdtYWlsLmNvbSIsImlhdCI6MTc2MzU2NzE2OCwiZXhwIjoxNzYzNjUzNTY4fQ.Zfnwa6_zlwzKj8TMGlNyJVL-SV6MVq0OIEoYJ0NYVCo",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/atividades/11",
+              "raw": "{{base_url}}/atividades/usuario/6",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "atividades",
-                "11"
+                "usuario",
+                "6"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get All",
-          "id": "8939c8e0-972d-4db8-9649-19419b00a66b",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/atividades",
               "host": [
@@ -222,12 +204,10 @@
                 "atividades"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Create",
-          "id": "bfdfb988-02e4-4550-a93b-b7ec3746ae18",
           "request": {
             "auth": {
               "type": "bearer",
@@ -240,7 +220,6 @@
               ]
             },
             "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n  \"nome\": \"Desenvolvimento de funcionalidade 2\",\r\n  \"usuarioId\": 6,\r\n  \"tempoInicio\": \"2024-01-15T11:31:00\",\r\n  \"tempoFim\": \"2024-01-15T14:30:00\",\r\n  \"tipo\": \"TRABALHO\"\r\n}",
@@ -259,15 +238,12 @@
                 "atividades"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Update",
-          "id": "59a0385f-18a9-4b02-8cc3-57c2fb248a6e",
           "request": {
             "method": "PUT",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n  \"nome\": \"Desenvolvimento de funcionalidaded\",\r\n  \"usuarioId\": 4,\r\n  \"tempoInicio\": \"2024-01-15T08:00:00\",\r\n  \"tempoFim\": \"2024-01-15T11:30:00\",\r\n  \"tipo\": \"TRABALHO\"\r\n}",
@@ -287,15 +263,12 @@
                 "1"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Delete",
-          "id": "6e815973-f6d9-46c3-9e6e-91d82d01e703",
           "request": {
             "method": "DELETE",
-            "header": [],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"nome\": \"Pedro Novais\",\r\n    \"email\": \"phenrique101007@gmail.com\",\r\n    \"senha\": \"@Geladeirax99\"\r\n}",
@@ -315,18 +288,15 @@
                 "1"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "38e6e3e6-146d-4143-9530-5f00e85bd3c8"
+      ]
     },
     {
       "name": "Score Diario",
       "item": [
         {
           "name": "Get by Id",
-          "id": "4870034e-5a07-4f9f-b69b-38dc0b59c84a",
           "request": {
             "auth": {
               "type": "bearer",
@@ -339,7 +309,6 @@
               ]
             },
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/score-diario/2",
               "host": [
@@ -350,12 +319,10 @@
                 "2"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get bu UsuarioId",
-          "id": "30c38115-d3be-4fd7-8b1e-a7b3f430d927",
           "request": {
             "auth": {
               "type": "bearer",
@@ -368,7 +335,6 @@
               ]
             },
             "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/score-diario/usuario/6",
               "host": [
@@ -380,42 +346,27 @@
                 "6"
               ]
             }
-          },
-          "response": []
+          }
         }
-      ],
-      "id": "992b8464-a230-4df8-8657-c6cc714501a6"
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "id": "3011d475-dffa-45fd-87bd-8663a3568280",
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
+      ]
     },
     {
-      "listen": "test",
-      "script": {
-        "id": "bd6440f1-7567-4a5c-923f-8a25d4178115",
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
+      "name": "IA",
+      "item": [
+        {
+          "name": "New Request",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
     {
-      "id": "f88ab15a-2235-432e-9581-2bdfb5596b8c",
       "key": "base_url",
       "value": ""
     }
