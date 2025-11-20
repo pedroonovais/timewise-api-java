@@ -2,17 +2,18 @@ spring:
   application:
     name: timewise
   
-  # Habilita Docker Compose para iniciar containers automaticamente
+  # Habilita Docker Compose apenas em desenvolvimento local
   docker:
     compose:
-      enabled: true
+      enabled: ${SPRING_DOCKER_COMPOSE_ENABLED:true}
       file: compose.yaml
   
   # Configuração do banco de dados PostgreSQL
+  # Usa variáveis de ambiente no Render, com valores padrão para desenvolvimento local
   datasource:
-    url: jdbc:postgresql://localhost:5432/timewise_db
-    username: timewise_user
-    password: timewise_password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/timewise_db}
+    username: ${SPRING_DATASOURCE_USERNAME:timewise_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:timewise_password}
     driver-class-name: org.postgresql.Driver
   
   # Configuração JPA/Hibernate
@@ -23,8 +24,8 @@ spring:
       # create-drop: cria ao iniciar e apaga ao encerrar (útil para testes)
       # validate: apenas valida o schema, não altera nada
       # none: desabilita a geração automática
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
         format_sql: true
@@ -37,11 +38,12 @@ spring:
     fallback-to-system-locale: true
   
   # Configuração RabbitMQ
+  # Usa variáveis de ambiente no Render, com valores padrão para desenvolvimento local
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: timewise_user
-    password: timewise_password
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:timewise_user}
+    password: ${SPRING_RABBITMQ_PASSWORD:timewise_password}
     # Configuração de conexão com retry automático
     connection-timeout: 60000
     template:
@@ -63,6 +65,7 @@ spring:
         auto-startup: true
 
 # Configuração JWT
+# Usa variável de ambiente no Render, com valor padrão para desenvolvimento local
 jwt:
-  secret: timewise-secret-key-2024-very-secure-and-long-key-for-jwt-token-generation-minimum-256-bits
-  expiration: 86400000 # 24 horas em milissegundos
+  secret: ${JWT_SECRET:timewise-secret-key-2024-very-secure-and-long-key-for-jwt-token-generation-minimum-256-bits}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 horas em milissegundos
