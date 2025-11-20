@@ -66,8 +66,3 @@ spring:
 jwt:
   secret: timewise-secret-key-2024-very-secure-and-long-key-for-jwt-token-generation-minimum-256-bits
   expiration: 86400000 # 24 horas em milissegundos
-
-# Configuração Groq API
-groq:
-  api-key: ${GROQ_API_KEY}
-  model: llama-3.1-8b-instant

@@ -119,18 +119,12 @@
 			<version>2.1.0</version>
 		</dependency>
 
-	<!-- RabbitMQ -->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-amqp</artifactId>
-	</dependency>
-
-	<!-- WebFlux para WebClient (Groq API) -->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-webflux</artifactId>
-	</dependency>
-</dependencies>
+		<!-- RabbitMQ -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
