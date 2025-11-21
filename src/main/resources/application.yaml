@@ -64,6 +64,15 @@ spring:
         # Aguarda o RabbitMQ estar pronto antes de iniciar listeners
         auto-startup: true
 
+  # Configuração AI (Groq via Spring AI OpenAI)
+  ai:
+    openai:
+      base-url: https://api.groq.com/openai
+      api-key: ${GROQ_API_KEY}
+      chat:
+        options:
+          model: llama-3.1-8b-instant
+
 # Configuração JWT
 # Usa variável de ambiente no Render, com valor padrão para desenvolvimento local
 jwt:
