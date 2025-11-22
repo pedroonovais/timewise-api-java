@@ -27,8 +27,8 @@ A solução é modularizada em camadas e utiliza **JPA/Hibernate com PostgreSQL*
 # 👩‍💻 Participantes
 
 - Pedro Henrique Mendonça de Novais - RM555276
-- Letícia Zago de Souza - RMXXXXXX
-- Ana Carolina dos Reis Santana - RMXXXXXX
+- Letícia Zago de Souza - RM558464
+- Ana Carolina dos Reis Santana - RM556219
 
 ---
 
